@@ -66,6 +66,7 @@ namespace MasjidConnectAPI.Controllers
 
                         // You can save file URL to DB here
                         var fileUrl = $"wwwroot/Images/Masjid";
+                        
 
                         sb.Append($"<Images><Image>{fileName}</Image><ImagePath>{fileUrl}</ImagePath></Images>");
                     }
