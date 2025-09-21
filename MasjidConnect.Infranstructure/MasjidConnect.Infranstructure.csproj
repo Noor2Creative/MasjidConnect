@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MasjidConnect.Application">
+      <HintPath>..\MasjidConnect.Application\bin\Debug\net8.0\MasjidConnect.Application.dll</HintPath>
+    </Reference>
+    <Reference Include="MasjidConnect.Model">
+      <HintPath>..\MasjidConnect.Model\bin\Debug\net8.0\MasjidConnect.Model.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
