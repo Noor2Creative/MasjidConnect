@@ -2,6 +2,7 @@
 using MasjidConnect.Application.Interfaces;
 using MasjidConnect.Model.Request.Masjid;
 using MasjidConnect.Model.Response;
+using MasjidConnect.Model.Response.Masjid;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace MasjidConnectAPI.Controllers
                 #region File upload
                 if (model.MasjidImage != null && model.MasjidImage.Any())
                 {
-                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Masjid");
+                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Images\\Masjid");
 
                     if (!Directory.Exists(uploadPath))
                         Directory.CreateDirectory(uploadPath);
@@ -56,7 +57,7 @@ namespace MasjidConnectAPI.Controllers
                             return BadRequest(response);
                         }
 
-                        var fileName = Guid.NewGuid().ToString() + ext;
+                        var fileName = $"MasjidConnect_{DateTime.Now.ToString("ddMMyyHHmmssfff")}{ext}";
                         var filePath = Path.Combine(uploadPath, fileName);
 
                         using (var stream = new FileStream(filePath, FileMode.Create))
@@ -81,16 +82,70 @@ namespace MasjidConnectAPI.Controllers
                 model.EnteredBy = Convert.ToInt32(userId);
 
                 response = await _masjidRepository.RegisterMasjidAsync(model);
-                if (response.Status.ToLower() == "success")
-                    return Ok(response);
+                if (response.Status.ToUpper() != "OK")
+                    return BadRequest(response);
 
-                return BadRequest(response);
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error message: {ex.Message}\n Error Info: {ex.StackTrace}");
             }            
         }
+
+
+        
+        [HttpPost("GetAllMasjid")]
+        public async Task<IActionResult> GetAllMasjidAsync()
+        {
+            MasjidRespose masjidRespose = new MasjidRespose
+            {
+                ResponseHeader = new ResponseHeader(),
+                MasjidList = new List<MasjidDto>()
+            };
+            try
+            {
+                masjidRespose = await _masjidRepository.GetAllMasjidAsync();
+                if (masjidRespose.ResponseHeader.Status.ToUpper() == "OK")
+                    return Ok(masjidRespose);
+
+                return BadRequest(masjidRespose);
+            }
+            catch (Exception ex)
+            {
+                masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                masjidRespose.ResponseHeader.Code = ex.Message;
+                masjidRespose.ResponseHeader.Message = ex.StackTrace;
+                return StatusCode(500, masjidRespose);
+            }
+        }
+
+        [HttpPost("GetMasjidById")]
+        public async Task<IActionResult> GetMasjidByIdAsync(int Id)
+        {
+            MasjidRespose masjidRespose = new MasjidRespose
+            {
+                ResponseHeader = new ResponseHeader(),
+                MasjidDto = new MasjidDto()
+            };
+            try
+            {
+                masjidRespose = await _masjidRepository.GetMasjidByIdAsync(Id);
+                if (masjidRespose.ResponseHeader.Status.ToUpper() == "OK")
+                    return Ok(masjidRespose);
+
+                return BadRequest(masjidRespose);
+            }
+            catch (Exception ex)
+            {
+                masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                masjidRespose.ResponseHeader.Code = ex.Message;
+                masjidRespose.ResponseHeader.Message = ex.StackTrace;
+                return StatusCode(500, masjidRespose);
+            }
+        }
+
+
 
         [HttpPost("test_api")]
         public async Task<IActionResult> Test_api()

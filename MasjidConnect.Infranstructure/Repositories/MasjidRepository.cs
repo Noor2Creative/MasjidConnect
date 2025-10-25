@@ -1,4 +1,5 @@
-﻿using MasjidConnect.Application;
+﻿using Azure.Core;
+using MasjidConnect.Application;
 using MasjidConnect.Application.Interfaces;
 using MasjidConnect.Infranstructure.DbHelpers;
 using MasjidConnect.Model.Request.Masjid;
@@ -6,6 +7,8 @@ using MasjidConnect.Model.Response;
 using MasjidConnect.Model.Response.Masjid;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Net;
+using System.Reflection;
 
 
 namespace MasjidConnect.Infranstructure.Repositories
@@ -68,11 +71,111 @@ namespace MasjidConnect.Infranstructure.Repositories
         }
         public async Task<MasjidRespose?> GetMasjidByIdAsync(int Id)
         {
-            throw new NotImplementedException();
+            MasjidRespose masjidRespose = new MasjidRespose
+            {
+                ResponseHeader = new ResponseHeader(),
+                MasjidList = new List<MasjidDto>()
+            };
+            try
+            {
+                var parameters = new[]
+                {
+                    new SqlParameter("@Id", Id) };
+
+                using (SqlDataReader dr = await _dbExecuter.ExecuteProcedureDrAsync(ProcedureManager.GetMasjid, parameters))
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            MasjidDto masjidDto = new MasjidDto
+                            {
+                                Id = Convert.ToInt32(dr["RecId"].ToString()),
+                                Name = dr["MasjidName"].ToString(),
+                                Address = dr["Address"].ToString(),
+                                OtherName = dr["OtherName"].ToString(),
+                                State = dr["State"].ToString(),
+                                District = dr["District"].ToString(),
+                                City = dr["City"].ToString(),
+                                ContactPerson = dr["ContactPerson"].ToString(),
+                                ContactNo = dr["ContactNo"].ToString()
+                            };
+                            masjidRespose.MasjidDto = masjidDto;
+                        }
+                        masjidRespose.ResponseHeader.Status = Enums.StatusType.Success.GetDescription();
+                        masjidRespose.ResponseHeader.Code = "";
+                        masjidRespose.ResponseHeader.Message = "";
+                    }
+                    else
+                    {
+                        masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                        masjidRespose.ResponseHeader.Code = Enums.ErrorType.NoRecord.ToString();
+                        masjidRespose.ResponseHeader.Message = Enums.ErrorType.NoRecord.GetDescription();
+                    }
+                }
+                ;
+                return masjidRespose;
+            }
+            catch (Exception ex)
+            {
+
+                masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                masjidRespose.ResponseHeader.Code = ex.Message;
+                masjidRespose.ResponseHeader.Message = ex.StackTrace;
+                return masjidRespose;
+            }
         }
         public async Task<MasjidRespose?> GetAllMasjidAsync()
         {
-            throw new NotImplementedException();
+            MasjidRespose masjidRespose = new MasjidRespose
+            {
+                ResponseHeader = new ResponseHeader(),
+                MasjidList = new List<MasjidDto>()
+            };
+            try
+            {
+                using (SqlDataReader dr = await _dbExecuter.ExecuteProcedureDrAsync(ProcedureManager.SpGetAllMasjid, null))
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            MasjidDto masjidDto = new MasjidDto
+                            {
+                                Id = Convert.ToInt32(dr["RecId"].ToString()),
+                                Name = dr["MasjidName"].ToString(),
+                                Address = dr["Address"].ToString(),
+                                OtherName = dr["OtherName"].ToString(),
+                                State = dr["State"].ToString(),
+                                District = dr["District"].ToString(),
+                                City = dr["City"].ToString(),
+                                ContactPerson = dr["ContactPerson"].ToString(),
+                                ContactNo = dr["ContactNo"].ToString()
+                            };
+                            masjidRespose.MasjidList.Add(masjidDto);
+                        }
+                        masjidRespose.ResponseHeader.Status = Enums.StatusType.Success.GetDescription();
+                        masjidRespose.ResponseHeader.Code = "";
+                        masjidRespose.ResponseHeader.Message = "";
+                    }
+                    else
+                    {
+                        masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                        masjidRespose.ResponseHeader.Code = Enums.ErrorType.NoRecord.ToString();
+                        masjidRespose.ResponseHeader.Message = Enums.ErrorType.NoRecord.GetDescription();
+                    }
+                }
+                ;
+                return masjidRespose;
+            }
+            catch (Exception ex)
+            {
+
+                masjidRespose.ResponseHeader.Status = Enums.StatusType.Fail.GetDescription();
+                masjidRespose.ResponseHeader.Code = ex.Message;
+                masjidRespose.ResponseHeader.Message = ex.StackTrace;
+                return masjidRespose;
+            }
         }
 
         public async Task<ResponseHeader?> RegisterNamazTimeAsync(NamazTimeRequest model)

@@ -7,7 +7,7 @@ namespace MasjidConnect.Application
     {
         public enum StatusType
         {
-            [Description("Success")]
+            [Description("OK")]
             Success,
 
             [Description("Fail")]

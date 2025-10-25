@@ -7,5 +7,7 @@
         public const string GetUserByUserId = "SP_GetUserByUserid";
         public const string InsertOrUpdateMasjid = "SP_InsertOrUpdateMasjid_set";
         public const string InsertOrUpdateNamazTime = "sp_InsertOrUpdateNamazTime";
+        public const string SpGetAllMasjid = "SP_GetAllMasjid";
+        public const string GetMasjid = "SP_GetMasjidById";
     }
 }
