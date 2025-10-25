@@ -17,10 +17,10 @@
         public string State { get; set; } = string.Empty;
         public string ContactPerson { get; set; } = string.Empty;
         public string ContactNo { get; set; } = string.Empty;
-        public PrayerTimeDto? PrayerTimeDto { get; set; }
+        public NamazTimeDto? NamazTimeDto { get; set; }
     }
 
-    public class PrayerTimeDto
+    public class NamazTimeDto
     {
         public int Id { get; set; }
         public int MasjidId { get; set; }

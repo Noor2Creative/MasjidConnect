@@ -1,4 +1,5 @@
-﻿using MasjidConnect.Application;
+﻿using Azure;
+using MasjidConnect.Application;
 using MasjidConnect.Application.Interfaces;
 using MasjidConnect.Model.Request.Masjid;
 using MasjidConnect.Model.Response;
@@ -24,9 +25,10 @@ namespace MasjidConnectAPI.Controllers
         [HttpPost("register_masjid")]
         public async Task<IActionResult> RegisterMasjidAsync([FromForm] MasjidRequest model, [FromHeader(Name ="Authorization")] string authorization)
         {
+            ResponseHeader response = new ResponseHeader();
             try
             {
-                ResponseHeader response = new ResponseHeader();
+                
                 // Call base method to validate token
                 var (isValid, responseHeader, claims) = ValidateTokeAndGetClaims(authorization, "sub", "role");
 
@@ -89,7 +91,10 @@ namespace MasjidConnectAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error message: {ex.Message}\n Error Info: {ex.StackTrace}");
+                response.Status = Enums.StatusType.Fail.GetDescription();
+                response.Code = ex.Message;
+                response.Message = ex.StackTrace;
+                return StatusCode(500, response);
             }            
         }
 
@@ -142,6 +147,28 @@ namespace MasjidConnectAPI.Controllers
                 masjidRespose.ResponseHeader.Code = ex.Message;
                 masjidRespose.ResponseHeader.Message = ex.StackTrace;
                 return StatusCode(500, masjidRespose);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("RegisterNamazTime")]
+        public async Task<IActionResult> RegisterNamazTimeAsync(NamazTimeRequest model)
+        {
+            ResponseHeader response = new ResponseHeader();
+            try
+            {
+                response = await _masjidRepository.RegisterNamazTimeAsync(model);
+                if (response.Status.ToUpper() != "OK")
+                    return BadRequest(response);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Status = Enums.StatusType.Fail.GetDescription();
+                response.Code = ex.Message;
+                response.Message = ex.StackTrace;
+                return StatusCode(500, response);
             }
         }
 

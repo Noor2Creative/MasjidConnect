@@ -17,7 +17,6 @@ namespace MasjidConnect.Model.Request.Masjid
         public int EnteredBy { get; set; } = 0;
         public List<IFormFile>? MasjidImage { get; set; }
         public string? ImagesXml { get; set; } = string.Empty;
-        //public PrayerTime? PrayerTime { get; set; }
     }
     public class NamazTimeRequest
     {
